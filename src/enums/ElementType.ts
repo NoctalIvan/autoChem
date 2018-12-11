@@ -1,4 +1,6 @@
 export enum ElementType {
-    H = 'H',
-    He = 'He',
+    $ = '$',
+    H2O = 'H2O',
+    H2 = 'H2',
+    O2 = 'O2',
 }
