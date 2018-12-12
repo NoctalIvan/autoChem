@@ -10,15 +10,15 @@ describe('baloon integ test', () => {
             .filter(a => ['e1', 'p1', 'p2', 's1'].includes(a.id))
             .map(a => new Unit(a))
         player.units[0].priority = 0.6
+        player.units[0].cpt = 3
         player.units[1].priority = 0.5
         player.units[2].priority = 0.4
         player.units[3].priority = 0.3
         
         player.resolveTick()
         player.resolveTick()
-        console.log(player)
         assert.deepEqual(player.lastEnergyBilan, {
-            produce: 5, consume: 4
+            produce: 12, consume: 7
         })
         assert.deepEqual(player.resources, {
             H2O: { type: 'H2O', amount: 0 },
