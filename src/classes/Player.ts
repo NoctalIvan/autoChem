@@ -1,16 +1,18 @@
 import { IResource } from "../interfaces/IResource";
 import { Unit } from "./Unit";
+import { ElementType } from "../enums/ElementType";
 
 export class Player {
-    resources:IResource[]
+    resources:{[type: string]: IResource}
     units:Unit[]
 
     // stats
     lastEnergyBilan: {produce:number, consume:number}
-    lastResourceProduction: IResource[]
+    lastResourceProduction: {[type: string]: IResource}
+    lastStorageCap: {[type: string]: IResource}
 
     constructor() {
-        this.resources = []
+        this.resources = {}
         this.units = []
     }
 
@@ -18,6 +20,7 @@ export class Player {
         this.lastEnergyBilan = this.getEnergyBilan()
         const energyPercentage = Math.min(this.lastEnergyBilan.produce / this.lastEnergyBilan.consume, 1)
         this.resolveProductionTick(energyPercentage)
+        this.resolveStorageCap()
     }
 
     getEnergyBilan(): {produce:number, consume:number} {
@@ -32,7 +35,7 @@ export class Player {
     }
 
     resolveProductionTick(energyPercentage:number) {
-        this.lastResourceProduction = []
+        this.lastResourceProduction = {}
 
         this.units.sort((a,b) => b.priority - a.priority)
         this.units.forEach(unit => {
@@ -71,6 +74,25 @@ export class Player {
                 this.resources[resource.type] = {type: resource.type, amount: this.resources[resource.type].amount + resource.amount}
                 this.lastResourceProduction[resource.type] = {type: resource.type, amount: this.lastResourceProduction[resource.type].amount + resource.amount}
             })
+        })
+    }
+
+    resolveStorageCap() {
+        this.lastStorageCap = {}
+        this.lastStorageCap['$'] = {type: ElementType.$, amount: Infinity}
+        this.units.forEach(unit => {
+            unit.resourceStorage.forEach(resource => {
+                if(this.lastStorageCap[resource.type]) {
+                    this.lastStorageCap[resource.type].amount = this.lastStorageCap[resource.type].amount + resource.amount
+                } else {
+                    this.lastStorageCap[resource.type] = {type: resource.type, amount: resource.amount}
+                }
+            })
+        })
+
+        Object.keys(this.resources).forEach(resourceType => {
+            const cap = this.lastStorageCap[resourceType] || {amount: 0}
+            this.resources[resourceType].amount = Math.min(this.resources[resourceType].amount, cap.amount)
         })
     }
 }

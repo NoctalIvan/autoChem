@@ -16,13 +16,14 @@ describe('baloon integ test', () => {
         
         player.resolveTick()
         player.resolveTick()
+        console.log(player)
         assert.deepEqual(player.lastEnergyBilan, {
             produce: 5, consume: 4
         })
         assert.deepEqual(player.resources, {
             H2O: { type: 'H2O', amount: 0 },
-            O2: { type: 'O2', amount: 16 },
-            H2: { type: 'H2', amount: 28 },
+            O2: { type: 'O2', amount: 4 },
+            H2: { type: 'H2', amount: 8 },
             '$': { type: '$', amount: 12 } 
         })
         assert.deepEqual(player.lastResourceProduction, {
